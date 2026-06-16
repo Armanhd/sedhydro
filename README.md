@@ -3,8 +3,11 @@ SedHydro is a hydrological-model-coupled, multi-fraction erosion and sediment tr
 <p align="center">
   <img src="docs/figures/erosion_scheme.jpg" width="500">
 </p>
+
+
 The framework was developed to address several limitations commonly encountered in hydro-
 sediment modelling systems, including:
+
 - poor representation of geomorphic processes within the river network, which strongly affects sediment transport,
 - limited representation of hillslope sediment connectivity,
 - inability to separately route sediment fractions,
@@ -14,11 +17,12 @@ sediment modelling systems, including:
 
 SedHydro integrates multiple sediment-process components into a unified modular framework in-
 cluding:
-• spatially distributed erosion generation,
-• hillslope sediment delivery routing,
-• physical-based river sediment transport,
-• multi-fraction sediment dynamics,
-• and depressional storage attenuation.
+
+- spatially distributed erosion generation,
+- hillslope sediment delivery routing,
+- physical-based river sediment transport,
+- multi-fraction sediment dynamics,
+- and depressional storage attenuation.
 
 <p align="center">
   <img src="docs/figures/framework_coupling.jpeg" width="800">
