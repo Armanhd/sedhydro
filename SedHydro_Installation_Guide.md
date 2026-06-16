@@ -184,13 +184,13 @@ Use the Conda environment supplied by ```environment.yml```.
 Avoid mixing Conda and pip installations.
 
 Wrong Python Version
-
+```
 python --version
-
+```
 SedHydro is designed for Python 3.11.
 
 12. Quick Summary
-
+```
 git clone https://github.com/<organization>/SedHydro.git
 
 cd SedHydro
@@ -200,5 +200,5 @@ conda env create -f environment.yml
 conda activate sedhydro
 
 python SedHydro_mp.py
-
+```
 This workflow provides a complete and reproducible installation of SedHydro on Windows and macOS systems.
