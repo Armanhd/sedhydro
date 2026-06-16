@@ -1,7 +1,7 @@
 # sedhydro
 SedHydro is a hydrological-model-coupled, multi-fraction erosion and sediment transport framework designed for simulation of erosion, transport, deposition, and re-entrainment of sediment across river basins of any scale. The framework is modular and hydrology-model agnostic, allowing coupling with any hydrological model capable of providing the required hydrological forcing and river hydraulic variables. The framework has been developed to provide a flexible and computationally scalable environment to coupling externally simulated hydrology with spatially distributed erosion processes and physically based river sediment routing.
 <p align="center">
-  <img src="docs/figures/erosion_scheme.jpg" width="800">
+  <img src="docs/figures/erosion_scheme.jpg" width="500">
 </p>
 The framework was developed to address several limitations commonly encountered in hydro-
 sediment modelling systems, including:
