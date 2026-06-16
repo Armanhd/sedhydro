@@ -1,0 +1,283 @@
+# =========================================================
+# Example SedHydro configuration file
+# =========================================================
+# Replace all "/path/to/..." placeholders with locations on your system.
+# Relative paths under [catchment] are resolved relative to:
+#   main_directory_[mac/win] + catchment_folder
+#
+# Example:
+# working_directory_mac = "/Users/username/SedHydro"
+# working_directory_win = "D:/SedHydro"
+# =========================================================
+
+# =========================================================
+# model settings
+# =========================================================
+[settings]
+start_date = "YYYY-MM-DD"
+end_date = "YYYY-MM-DD"
+# Grid settings:
+# cell_size --> grid-cell resolution [m]
+# clip_to_catchment:
+#     true  = clip grid cells to exact catchment boundary
+#     false = retain full square cells intersecting the catchment
+# overlay_method:
+#     dominant_class   = use dominant land-cover/geology class per grid
+#     fractional_class = use fractional coverage of all classes per grid
+cell_size = 1000
+clip_to_catchment = false
+overlay_method = "dominant_class"
+
+# cold-region erosion option:
+# true  = activate snow attenuation using SWE
+# false = no snow attenuation
+cold_region = true
+
+# model_mode:
+# "calibration" = optimise HydroSed parameters
+# "validation"  = run model using calibrated parameters
+model_mode = "calibration"
+
+# =========================================================
+# Shared common directories
+# =========================================================
+[common]
+# working directory
+working_directory_mac = "/path/to/SedHydro"
+working_directory_win = "C:/path/to/SedHydro"
+
+# main directory for hydrological model run
+main_directory_mac = "/path/to/hydrological_model_runs"
+main_directory_win = "C:/path/to/hydrological_model_runs"
+
+# folder name for running catchment
+catchment_folder = "swan_river"
+
+# main directory for routing hydrological model
+main_dir_routing_mac = "/path/to/SedHydro/TempSedRout"
+main_dir_routing_win = "C:/path/to/SedHydro/TempSedRout"
+
+# initial model coefficients for param_dict
+coefs_path_mac = "/path/to/SedHydro/Coeffs.csv"
+coefs_path_win = "C:/path/to/SedHydro/Coeffs.csv"
+
+
+# =========================================================
+# ========== directory for specific catchment======
+# =========================================================
+[catchment]
+# Example file names only. Replace with files for your catchment.
+# read hydrological model setting: SUMMA
+setting_directory = "settings/SUMMA/modelDecisions.txt"
+
+# catchment shapefile directory
+cat_shp_path = "shapefiles/catchment/semidistributed/run_1/catchment_HRUs_GRUs.shp"
+
+# catchment hru directory
+cat_hru_path = "shapefiles/catchment/semidistributed/run_1/catchment_HRUs_GRUs.shp"
+
+# read DEM file from SUMMA attributes
+dem_path = "attributes/elevation/dem/domain_catchment_elv.tif"
+
+# rainfall directory from forcing folder of hydrological model
+rainfall_directory = "data/model_ready/forcings"
+
+# runoff netcdf file directory from SUMMA
+SUMMA_path = "simulations/run_1/SUMMA/run_1_timestep.nc"
+
+# river hydrological variables directory from mizuRoute
+mizu_path = "simulations/run_1/mizuRoute/channel_geometry_all.nc"
+
+# shapefile of river network directory
+river_shp_file = "shapefiles/river_network/riverNetwork_semidistributed.shp"
+
+
+# =========================================================
+# ============= independent directory=======
+# =========================================================
+[reference]
+# csv file of land cover classes
+landclass_directory_mac = "/path/to/SedHydro/Landcover/Landcover_classes.csv"
+landclass_directory_win = "C:/path/to/SedHydro/Landcover/Landcover_classes.csv"
+
+# surficial geology map directory
+geol_path_mac = "/path/to/SedHydro/Geology/surficial_geology.tif"
+geol_path_win = "C:/path/to/SedHydro/Geology/surficial_geology.tif"
+
+# csv file of geology classes
+geolclass_directory_mac = "/path/to/SedHydro/Geology-class.csv"
+geolclass_directory_win = "C:/path/to/SedHydro/Geology-class.csv"
+
+# directory for landcover data
+# --> User-defined Land Cover (from landcover 2020 class)
+landcover_path_mac = "/path/to/SedHydro/Landcover/landcover-2020-classification.tif"
+landcover_path_win = "C:/path/to/SedHydro/Landcover/landcover-2020-classification.tif"
+
+# read soil texture data
+sand_path_mac = "/path/to/SedHydro/Soil/Sand_X0_5_cm_100m1980-2000v1.tiff"
+sand_path_win = "C:/path/to/SedHydro/Soil/Sand_X0_5_cm_100m1980-2000v1.tiff"
+
+silt_path_mac = "/path/to/SedHydro/Soil/Silt_X0_5_cm_100m1980-2000v1.tiff"
+silt_path_win = "C:/path/to/SedHydro/Soil/Silt_X0_5_cm_100m1980-2000v1.tiff"
+
+# riverbed and sediment size class files
+sediment_size_file = "sediment_size_class.csv"
+
+# read directory for config file for TempSedROut as TOML
+routing_constants_toml_mac = "/path/to/SedHydro/TempSedRout/constants.toml"
+routing_constants_toml_win = "C:/path/to/SedHydro/TempSedRout/constants.toml"
+
+
+# =========================================================
+# ============= observed SSC timeseries directory=====
+# =========================================================
+[observed]
+# observed SSC timeseries directory
+observed_path_mac = "/path/to/SedHydro/observations/SSC_timeseries.csv"
+observed_path_win = "C:/path/to/SedHydro/observations/SSC_timeseries.csv"
+
+
+# =========================================================
+# ============= Erosion1b model results for Erosion2=====
+# =========================================================
+[erosion]
+# output directory for model_sed_final from Erosion1b
+# name is: /outputs/[output_model_sed_final_pkl]
+
+# model_sed_final_path_mac = "/path/to/SedHydro/outputs/<run_name>/model_sed_final.pkl"
+# model_sed_final_path_win = "C:/path/to/SedHydro/outputs/<run_name>/model_sed_final.pkl"
+
+# output directory for model parameters
+# name is: /outputs/[output_optimisation_file_name1b]
+model_parameters_final_path_mac = "/path/to/SedHydro/outputs/<run_name>/calibrated_parameters.pkl"
+model_parameters_final_path_win = "C:/path/to/SedHydro/outputs/<run_name>/calibrated_parameters.pkl"
+
+
+# =========================================================
+# ============= output saving directory======
+# =========================================================
+[output]
+# model output saving directory
+output_dir_mac = "/path/to/SedHydro/outputs/<run_name>"
+output_dir_win = "C:/path/to/SedHydro/outputs/<run_name>"
+
+# filename to save model parameters for Erosion1b [in csv and pkl]
+output_optimisation_file_name1b = "optimised1_<run_name>"
+
+# filename to save model_sed [pkl] for Erosion paramaters
+output_model_sed_final_pkl = "model_sed_final.pkl"
+
+# filename to save model parameters for TempSedROut [in csv and pkl]
+output_optimisation_file_name2 = "optimised2_<run_name>"
+
+# Base filename for combined Erosion module - TempSedRout calibration results
+output_optimisation_file_name3 = "optimised_all_<run_name>"
+
+
+# =========================================================
+# ============= validation read parameters and saving directory======
+# =========================================================
+[validation]
+# Validation simulation period
+start_date_validation = "YYYY-MM-DD"
+end_date_validation   = "YYYY-MM-DD"
+
+# read optimised parameters file name for model validation runs
+validation_coefs_path_mac = "/path/to/SedHydro/outputs/calibrated_parameters.csv"
+validation_coefs_path_win = "C:/path/to/SedHydro/outputs/calibrated_parameters.csv"
+
+# filename to save model_sed [pkl] for validation
+validation_model_sed_final_pkl = "validation_model_sed_final_basin.pkl"
+
+# filename to save model outputs for validation [in csv and pkl]
+validation_file_name = "validation_basin_run"
+
+# =========================================================
+# ============= Storage data for depressional systems ======
+# =========================================================
+[storage]
+# file name for storage directory
+# storage_file_dir_mac = "/path/to/SedHydro/TempSedRout/storage_features.csv"
+# storage_file_dir_win = "C:/path/to/SedHydro/TempSedRout/storage_features.csv"
+
+# if true use TempSedRout_storage if false use TempSedRout 
+use_storage = false
+
+# type of storage data available: length, width, area
+storage_data_type = "area"
+
+# =========================================================
+# ============= Point sediment source data ======
+# =========================================================
+[point_sources]
+use_point_sources = false
+point_source_file = "/path/to/point_sources.csv"
+point_source_type = "concentration"  # "concentration" or "load"
+
+# =========================================================
+# Optimisation settings for Erosion3 / combined model
+# optimise_only_routing=[] --> means optimise no TempSedRout parameters.
+# if optimise_only_routing is removed --> optimise all TempSedRout parameters 
+# (Remove this key entirely to pass Python None, which means optimise all eligible TempSedRout parameters.)
+# if optimise_only_routing=["Fd1_TempSedRout", "Fd2_TempSedRout" ] --> optimise only Fd1 and Fd2
+# =========================================================
+[erosion3_optimization]
+objective = "log_rmse"
+cold_region = true
+zero_landcover_class0 = true
+
+# If false, a_rout and mt_rout are excluded even if listed below.
+# If true, a_rout and mt_rout can be optimised if listed below and up > low.
+optimize_hill_routing_params = false
+
+# -------------------------
+# Storage routing options
+# These are read from [storage] in your current ErosionModel3_mp.py,
+# not directly from [erosion3_optimization].
+# Keep them here only as comments/reminders.
+# -------------------------
+
+# -------------------------
+# ErosionModel parameters to optimise
+# -------------------------
+optimise_only_erosion = ["al0", "al1", "al2", "al4", "al5", "bl0", "bl1", "bl2", "bl4", "bl5", "abase", "bbase", "as", "bs", "ceros", "ksnow", "a_rout", "mt_rout"]
+# optimise_only_erosion = ["abase", "bbase", "as", "bs", "ceros", "ksnow", "a_rout", "mt_rout"]
+
+# -------------------------
+# TempSedRout parameters to optimise
+# -------------------------
+optimise_only_routing = ["dispers1_TempSedRout", "dispers2_TempSedRout", "dispers3_TempSedRout", "Fd1_TempSedRout", "Fd2_TempSedRout", "Fd3_TempSedRout", "cr1_TempSedRout", "cr2_TempSedRout", "cr3_TempSedRout"]
+# optimise_only_routing = []
+
+# -------------------------
+# Sediment fractions
+# -------------------------
+number_fractions = 3
+
+# -------------------------
+# DEAP optimisation settings
+# -------------------------
+n_generations = 10
+population_size = 30
+cxpb = 0.6
+mutpb = 0.3
+eta = 20.0
+seed = 42
+
+# -------------------------
+# Checkpointing
+# -------------------------
+checkpoint_path = "optimise3_deap_mp_swan_checkpoint.pkl"
+
+# -------------------------
+# Early stopping
+# -------------------------
+early_stop = true
+early_stop_rounds = 8
+early_stop_tol = 0.000001
+
+# -------------------------
+# Multiprocessing
+# -------------------------
+n_cores = 3
+chunksize = 1

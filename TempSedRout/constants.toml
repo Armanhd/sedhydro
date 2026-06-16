@@ -1,0 +1,33 @@
+
+# TempSedRout --> for river network routing
+# ============================
+
+
+# ============================
+# Paths
+# ============================
+main_dir_routing = "/Users/armanhaddadchi/Library/CloudStorage/OneDrive-UniversityofCalgary/ErosionModel/TempSedRout"
+
+
+# ============================
+# Physical constants
+# ============================
+Rrho = 1.65      # R=((rhos/rho)-1), rhos=2650, rho=1000 [-]
+g = 9.806        # gravitational acceleration [m/s^2]
+rho = 1000       # density of water [kg/m^3]
+rhos = 2650      # sediment density [kg/m^3]
+nu = 0.0000010533 # kinematic viscosity [m^2/s]
+
+# ============================
+# Model coefficients
+# ============================
+
+mcoef = 1        # drag / roughness coefficient (1-10)[-]
+kv = 0.4         # von Karman constant[-]
+SF = 0.1         # sand fraction (0-1)[-]
+ki = 0.3         # fraction of depth through which sediment is lifted[-]
+
+
+
+
+

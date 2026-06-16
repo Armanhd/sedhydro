@@ -1,0 +1,26 @@
+﻿Geology category,RasterValue,Description,Erodibility Class,Erodibility Rank
+I: Glacier ice,22,Ice and minor morainal debris.,1Very Low,1
+"R: Bedrock, undifferentiated",12,"Bedrock; area of abundant (greater than 75%) rock outcrop; alpine and non-alpine settings; may include colluvial deposits, till, and other minor surficial sediments.",1Very Low,2
+GMv: Veneer,15,"Sand, gravel, and pockets of finer sediment; thin to discontinuous sediment veneer and residual lag developed during marine submergence; includes areas of washed till and bedrock.",2Low,3
+Tb: Till blanket,5,"Diamicton; thick and continuous; may include fluted landforms, drumlins and morainal deposits.",2Low,3
+Wv: Regolith veneer,24,Diamicton with rubble to blocky felsenmeer; < 2 m thick; derived predominantly from weathering of bedrock; may include areas of bedrock mixed with till locally.,2Low,3
+Tv: Till veneer,10,Diamicton; thin and discontinuous; may include extensive areas of rock outcrop.,3Low–Moderate,4
+"W: Regolith, undifferentiated",25,Fine sand to clay diamicton which may include rubble and felsenmeer; variable thickness; derived predominantly from weathering of bedrock; may include areas of bedrock mixed with till locally.,3Low–Moderate,4
+GFc: Ice-contact sediments,9,"Sand and gravel and locally diamicton; variable thickness; complex of ice-contact stratified drift, and outwash; locally includes till and bedrock.",4Moderate,5
+Th: Hummocky till,16,Diamicton; thick and continuous; forming hummocky topography.,4Moderate,6
+Tm: Moraine complex,6,Diamicton; variable thickness; end and interlobate moraines; may include glaciofluvial sediments.,4Moderate,7
+GFp: Outwash plain sediments,4,"Sand and gravel; variable thickness; deposited as outwash sheets, valley trains and terraced sediments.",5Moderate–High,8
+GLn: Littoral and nearshore sediments,3,"Sand, silt, and gravel; variable thickness; deposited as deltas, sheet sands, and lag deposits.",5Moderate–High,9
+GMn: Littoral and nearshore sediments,14,"Sand and gravel; variable thickness; deposited as sheet sands, deltas, and extensive flights of beaches in marine and glaciomarine environments.",5Moderate–High,9
+Ln: Littoral and nearshore sediments,2,"Sand and locally gravel; variable thickness; deposited as sheet sands, lags, and beaches.",5Moderate–High,9
+Mn: Littoral and nearshore sediments,20,"Sand and locally gravel; variable thickness; deposited as sheet sands, lags, and beaches.",5Moderate–High,9
+"V: Quaternary volcanic rocks and deposits, undifferentiated.",23,Fine sand to clay diamicton which may include rubble and felsenmeer; variable thickness; derived predominantly from weathering of bedrock; may include areas of bedrock mixed with till locally.,5Moderate–High,10
+"A: Alluvial sediments, undifferentiated",7,"Silt, sand, clay, and gravel; stratified; variable thickness; floodplain, delta, and fan sediments; in places overlies and includes glaciofluvial sediments.",6High,11
+"C: Colluvial deposits, undifferentiated",19,"Blocks, rubble with sand and silt with minor clay; variable thickness; deposited as veneers and blankets; derived from a variety of surficial sediments and bedrock.",6High,11
+Cv: Colluvial veneer,21,"Blocks, rubble with sand and silt with minor clay; less than 2 m thick; derived from a variety of surficial sediments and bedrock.",6High,11
+GLo: Offshore sediments,8,"Silt and clay, locally containing stones; variable thickness; deposited in quiet water environments.",7Very High,12
+GMo: Offshore sediments,13,"Dominantly silt and clay, locally containing stones; variable thickness; deposited in quiet water marine and glaciomarine environments.",7Very High,12
+Lo: Offshore sediments,1,Fluid silty clay and clayey silt and mud; variable thickness; deposited in quiet water environments.,7Very High,12
+Mo: Offshore sediments,17,Fluid silty clay and clayey silt and mud; variable thickness; deposited in quiet water environments.,7Very High,12
+"E: Eolian sediments, undifferentiated",18,"Sand and minor silt; variable thickness; dunes, blowouts, and undulating plains; in most places overlies deltaic sediments, coarse lacustrine sediments, or glaciofluvial sediments.",8Extremely High,13
+"O: Organic deposits, undifferentiated",11,"Peat, muck, and minor inorganic sediments; generally greater than 2 m thick; large bog, fen, and swamp areas where organic fill masks underlying surficial materials.",8Extremely High,13

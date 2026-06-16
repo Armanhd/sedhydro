@@ -1,0 +1,28 @@
+name: erosionmodel
+
+channels:
+  - conda-forge
+
+dependencies:
+  - python=3.11
+
+  # core scientific stack
+  - numpy
+  - pandas
+  - scipy
+  - matplotlib
+
+  # geospatial stack
+  - geopandas
+  - rasterio
+  - shapely
+  - pyproj
+
+  # netcdf handling
+  - netcdf4
+
+  # optimization / algorithms
+  - deap
+
+  # utilities
+  - pip
