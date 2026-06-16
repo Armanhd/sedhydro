@@ -27,39 +27,39 @@ Option B — Download ZIP
 3. Create the Conda Environment
 
 The repository already contains:
-
+```
 environment.yml
-
+```
 Navigate to the SedHydro directory:
-
+```
 cd path/to/SedHydro
-
+```
 Create the environment:
-
+```
 conda env create -f environment.yml
-
+```
 This may take several minutes.
 
 4. Activate the Environment
-
+```
 conda activate sedhydro
-
+```
 If a different environment name is specified in environment.yml, use that name instead.
 
 Verify the environment:
-
+```
 conda info --envs
-
+```
 The active environment will be marked with *.
 
 5. Verify Installation
-
+```
 python -c "import numpy, pandas, geopandas, rasterio, tomllib; from netCDF4 import Dataset, num2date; import matplotlib.pyplot as plt; print('SedHydro environment is ready')"
-
+```
 If no errors occur, the environment is correctly configured.
 
 6. Repository Structure
-
+```
 SedHydro/
 │
 ├── SedHydro.py
@@ -80,7 +80,7 @@ SedHydro/
 ├── shapefiles/
 ├── attributes/
 └── data/
-
+```
 7. Configure SedHydro
 
 SedHydro uses TOML configuration files to define:
