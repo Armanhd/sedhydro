@@ -93,9 +93,9 @@ SedHydro uses TOML configuration files to define:
 • Output locations
 
 Example:
-
+```
 toml_file = "directory_settings_Athabasca.toml"
-
+```
 Before running:
 1. Open the selected TOML file.
 2. Update paths for your local computer.
@@ -104,21 +104,24 @@ Before running:
 8. Running SedHydro
 
 Standard Version
-
+```
 python SedHydro.py
-
+```
 Multiprocessing Version
-
+```
 python SedHydro_mp.py
-
+```
 The multiprocessing version is recommended for large catchments and calibration runs.
 
 9. Optional pip Installation
 
 Conda is recommended because it handles geospatial dependencies more reliably on both Windows and macOS.
-
+If you prefer pip instead of conda, create a file named:
+```
 requirements.txt
-
+```
+with:
+```
 numpy
 pandas
 geopandas
@@ -129,11 +132,11 @@ scipy
 deap
 pyproj
 shapely
-
+```
 Then install:
-
+```
 pip install -r requirements.txt
-
+```
 10. Notes
 
 The following modules are included with Python and do not require separate installation:
@@ -168,16 +171,16 @@ Main third-party packages include:
 11. Troubleshooting
 
 Environment Creation Fails
-
+```
 conda update -n base -c defaults conda
-
+```
 Then retry:
-
+```
 conda env create -f environment.yml
-
+```
 Geopandas or Rasterio Import Errors
 
-Use the Conda environment supplied by environment.yml.
+Use the Conda environment supplied by ```environment.yml```.
 Avoid mixing Conda and pip installations.
 
 Wrong Python Version
