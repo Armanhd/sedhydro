@@ -13,8 +13,10 @@ Before starting, install one of the following:
 
 Option A — Clone from GitHub
 
-git clone https://github.com/<organization>/SedHydro.git
-cd SedHydro
+```
+git clone https://github.com/Armanhd/sedhydro.git
+cd sedhydro
+```
 
 Option B — Download ZIP
 
