@@ -963,8 +963,6 @@ q = q.loc[routing_common_times].copy()
 Q = Q.loc[routing_common_times].copy()
 width = width.loc[routing_common_times].copy()
 
-#!!! Remove this
-# h=h-0.49
 #%% ======================
 #   Shared routing inputs
 #   ======================
@@ -980,271 +978,436 @@ sediment_size = pd.read_csv(os.path.join(main_dir_routing, sediment_size_file))
 if main_dir_routing not in sys.path:
     sys.path.append(main_dir_routing)
 
+#%% for validation or calibration
 
-#%% ======================
-#   Optimisation 3 - Combined ErosionModel + TempSedRout optimisation
-#   This optimises Erosion parameters and TempSedRout parameters together
-#   comparing final routed outlet SSC vs. df_SSC_obs
-#   ======================
+if model_mode == "validation":
 
-'''
-Recommended staged calibration strategy
----------------------------------------
-Although optimise3_deap can optimise all selected parameters together,
-a stable practical strategy is:
+    from optimisation_updated import build_model_sed_from_params
+    from optimisation_updated import add_time_columns_to_model
+    from optimisation_updated import calculate_grid_ssc
+    from optimisation_updated import save_validation_results3_full
 
-Step 1: Optimise main erosion parameters first.
+    from utils import compute_hru_ssc_from_grids_pergridrunoff
+    from utils import route_ssc_hru_gamma
+    from utils import create_ssc_hru_fraction_dict
+    from utils import fill_missing_hru
 
-    # Base coefficients
-    "abase", "bbase"
+    model_sed = build_model_sed_from_params(param_dict, model_input)
 
-    # Slope coefficients
-    "as", "bs"
+    # add time step columns to model_sed
+    # round all time columns
+    for df in [df_runoff, df_swe, df_h, df_Q, df_q, df_width]:
+        df["time"] = pd.to_datetime(df["time"]).dt.round("h")
 
-    # Rainfall / erosion / snow
-    "crain", "ceros", "ksnow"
-
-Step 2: Keep the main erosion parameters fixed at their calibrated values,
-then optimise main TempSedRout routing parameters.
-
-    # Dispersion coefficients
-    "dispers1_TempSedRout",
-    "dispers2_TempSedRout",
-    "dispers3_TempSedRout"
-
-    # Sediment size distribution
-    "median_diam_TempSedRout",
-    "SF_TempSedRout",
-    "interp_TempSedRout"
-
-    # Deposition coefficients
-    "Fd1_TempSedRout",
-    "Fd2_TempSedRout",
-    "Fd3_TempSedRout"
-
-    # Stream power / entrainment coefficients
-    "cr1_TempSedRout",
-    "cr2_TempSedRout",
-    "cr3_TempSedRout"
-
-Step 3: Keep the main erosion and routing parameters fixed, then optimise
-landcover and geology multipliers.
-
-    # Landcover coefficients for a
-    "al0", "al1", "al2", "al3", "al4", "al5"
-
-    # Landcover coefficients for b
-    "bl0", "bl1", "bl2", "bl3", "bl4", "bl5"
-
-    # Geology coefficients for a
-    "ag1", "ag2", "ag3", "ag4", "ag5", "ag6", "ag7",
-    "ag8", "ag9", "ag10", "ag11", "ag12", "ag13"
-
-    # Geology coefficients for b
-    "bg1", "bg2", "bg3", "bg4", "bg5", "bg6", "bg7",
-    "bg8", "bg9", "bg10", "bg11", "bg12", "bg13"
-
-Step 4: Optimise HRU gamma-routing parameters.
-
-    "a_rout", "mt_rout", "K_rout"
-
-Step 5: If use_storage=True, keep the other calibrated parameters fixed
-and optimise storage parameters.
-
-    "fl_storage", "fh_storage", "fw_storage", "fa_storage"
-'''
-
-from optimisation_updated import optimise3_deap
-from optimisation_updated import prepare_obs_sim_series3
-from optimisation_updated import objective_from_series
-from optimisation_updated import save_optimisation_results3_full
-
-# -----------------------------------------------------
-# Read Optimisation 3 settings from TOML
-# -----------------------------------------------------
-erosion3_cfg = cfg.get("erosion3_optimization", None)
-
-if erosion3_cfg is None:
-    objective3 = "log_rmse"
-    cold_region3 = cold_region
-    zero_landcover_class0 = True
-    optimize_hill_routing_params = False
-
-    optimise_only_erosion = cfg_list_or_none(
-        cfg["erosion1b_optimization"],
-        "optimize_only"
+    # find common times between df_runoff and df_h
+    common_times = (
+        pd.Index(df_runoff["time"].unique())
+        .intersection(df_h["time"].unique())
+        .sort_values()
     )
 
-    optimise_only_routing = cfg_list_or_none(
-        cfg["erosion2_optimization"],
-        "optimize_only"
+    # filter all dataframes
+    df_runoff = df_runoff[df_runoff["time"].isin(common_times)].copy()
+    df_h = df_h[df_h["time"].isin(common_times)].copy()
+    df_Q = df_Q[df_Q["time"].isin(common_times)].copy()
+    df_q = df_q[df_q["time"].isin(common_times)].copy()
+    df_width = df_width[df_width["time"].isin(common_times)].copy()
+
+    model_sed, time_cols = add_time_columns_to_model(model_sed, common_times)
+
+    model_sed = calculate_grid_ssc(
+        model_sed,
+        df_runoff,
+        rain,
+        time_cols,
+        df_swe=df_swe,
+        cold_region=cold_region,
+        zero_landcover_class0=True
     )
 
-    number_fractions = 3
+    param_dict_final = param_dict
+    model_sed_final1b = model_sed
 
-    n_generations3 = cfg["erosion2_optimization"].get("n_generations", 10)
-    population_size3 = cfg["erosion2_optimization"].get("population_size", 10)
-    cxpb3 = cfg["erosion2_optimization"].get("cxpb", 0.6)
-    mutpb3 = cfg["erosion2_optimization"].get("mutpb", 0.3)
-    eta3 = cfg["erosion2_optimization"].get("eta", 20.0)
-    seed3 = cfg["erosion2_optimization"].get("seed", 42)
-    checkpoint_path3 = "optimise3_deap_checkpoint.pkl"
-    early_stop_rounds3 = cfg["erosion2_optimization"].get("early_stop_rounds", 5)
-    early_stop_tol3 = cfg["erosion2_optimization"].get("early_stop_tol", 1e-4)
+    # 1) identify timestep columns
+    time_cols = [c for c in model_sed_final1b.columns if c.startswith("t_")]
+
+    SSC_hru_final1b = compute_hru_ssc_from_grids_pergridrunoff(
+        model_sed=model_sed_final1b,
+        df_runoff=df_runoff,
+        grid_hru_col="HRU_ID",
+        runoff_hru_col="hruId",
+        runoff_col="averageRoutedRunoff",
+        return_wide=True
+    )
+
+    a_rout = param_dict_final["a_rout"]["value"]
+    mt_rout = param_dict_final["mt_rout"]["value"]
+    K_rout = param_dict_final["K_rout"]["value"]
+
+    SSC_hru_routed_final1b = route_ssc_hru_gamma(
+        SSC_hru=SSC_hru_final1b,
+        a=a_rout,
+        mt=mt_rout,
+        K=K_rout,
+        hru_col="HRU_ID"
+    )
+
+    SSC_hru = SSC_hru_routed_final1b
+
+    SSC_hru_frac = create_ssc_hru_fraction_dict(
+        SSC_hru=SSC_hru,
+        sand_hru_stat=sand_hru_stat,
+        silt_hru_stat=silt_hru_stat,
+        hru_col="HRU_ID",
+        sand_col="mean_sand",
+        silt_col="mean_silt",
+        number_fractions=number_fractions
+    )
+
+    SSC_hru_frac = {
+        i: df.set_index("HRU_ID")
+        for i, df in SSC_hru_frac.items()
+    }
+
+    # make common times between SSC_hru and mizurout input
+    h_times = pd.DatetimeIndex(h.index).sort_values()
+    common_times = h_times.copy()
+
+    for frac, df in SSC_hru_frac.items():
+        ssc_times = pd.to_datetime(
+            df.columns,
+            format="t_%Y%m%d_%H%M%S"
+        ).sort_values()
+
+        common_times = common_times.intersection(ssc_times)
+
+    h = h.loc[common_times].copy()
+    q = q.loc[common_times].copy()
+    Q = Q.loc[common_times].copy()
+    width = width.loc[common_times].copy()
+
+    SSC_hru_frac_common = {}
+
+    for frac, df in SSC_hru_frac.items():
+        col_time_map = {
+            pd.to_datetime(col, format="t_%Y%m%d_%H%M%S"): col
+            for col in df.columns
+        }
+
+        keep_cols = [col_time_map[t] for t in common_times if t in col_time_map]
+        SSC_hru_frac_common[frac] = df.loc[:, keep_cols].copy()
+
+    SSC_hru_frac = SSC_hru_frac_common
+
+    # match SSC_hru_frac with river_gdf IDs
+    # add zero rows for all time steps for missing HRU_ID
+    SSC_hru_frac = fill_missing_hru(
+        SSC_hru_frac,
+        river_gdf,
+        id_col="LINKNO"
+    )
+
+    # save full validation/calibration-style outputs
+    validation_outputs3 = save_validation_results3_full(
+        param_dict=param_dict,
+        model_input=model_input,
+        df_runoff=df_runoff,
+        rain=rain,
+        cat_hru=cat_hru,
+        df_SSC_obs=df_SSC_obs,
+        sand_hru_stat=sand_hru_stat,
+        silt_hru_stat=silt_hru_stat,
+        river_gdf=river_gdf,
+        sediment_size=sediment_size,
+        toml_file=routing_constants_toml,
+        h=h,
+        q=q,
+        Q=Q,
+        width=width,
+        output_dir=output_dir,
+        file_name=final_file_name3,
+        model_sed_pkl_name=final_model_sed_final_pkl,
+        obs_time_col="time",
+        obs_value_col="SSC",
+        zero_landcover_class0=True,
+        number_fractions=number_fractions,
+        df_swe=df_swe,
+        cold_region=cold_region,
+        use_storage=use_storage,
+        river_storage=river_storage,
+        storage_data_type=storage_data_type,
+        objective="log_rmse"
+    )
+
+    print("Saved validation full results using file name:", final_file_name3)
+
 
 else:
-    objective3 = erosion3_cfg.get("objective", "log_rmse")
-    cold_region3 = erosion3_cfg.get("cold_region", cold_region)
-    zero_landcover_class0 = erosion3_cfg.get("zero_landcover_class0", True)
-    optimize_hill_routing_params = erosion3_cfg.get(
-        "optimize_hill_routing_params",
-        True
+
+    #%% ======================
+    #   Optimisation 3 - Combined ErosionModel + TempSedRout optimisation
+    #   This optimises Erosion parameters and TempSedRout parameters together
+    #   comparing final routed outlet SSC vs. df_SSC_obs
+    #   ======================
+
+    '''
+    Recommended staged calibration strategy
+    ---------------------------------------
+    Although optimise3_deap can optimise all selected parameters together,
+    a stable practical strategy is:
+
+    Step 1: Optimise main erosion parameters first.
+
+        # Base coefficients
+        "abase", "bbase"
+
+        # Slope coefficients
+        "as", "bs"
+
+        # Rainfall / erosion / snow
+        "crain", "ceros", "ksnow"
+
+    Step 2: Keep the main erosion parameters fixed at their calibrated values,
+    then optimise main TempSedRout routing parameters.
+
+        # Dispersion coefficients
+        "dispers1_TempSedRout",
+        "dispers2_TempSedRout",
+        "dispers3_TempSedRout"
+
+        # Sediment size distribution
+        "median_diam_TempSedRout",
+        "SF_TempSedRout",
+        "interp_TempSedRout"
+
+        # Deposition coefficients
+        "Fd1_TempSedRout",
+        "Fd2_TempSedRout",
+        "Fd3_TempSedRout"
+
+        # Stream power / entrainment coefficients
+        "cr1_TempSedRout",
+        "cr2_TempSedRout",
+        "cr3_TempSedRout"
+
+    Step 3: Keep the main erosion and routing parameters fixed, then optimise
+    landcover and geology multipliers.
+
+        # Landcover coefficients for a
+        "al0", "al1", "al2", "al3", "al4", "al5"
+
+        # Landcover coefficients for b
+        "bl0", "bl1", "bl2", "bl3", "bl4", "bl5"
+
+        # Geology coefficients for a
+        "ag1", "ag2", "ag3", "ag4", "ag5", "ag6", "ag7",
+        "ag8", "ag9", "ag10", "ag11", "ag12", "ag13"
+
+        # Geology coefficients for b
+        "bg1", "bg2", "bg3", "bg4", "bg5", "bg6", "bg7",
+        "bg8", "bg9", "bg10", "bg11", "bg12", "bg13"
+
+    Step 4: Optimise HRU gamma-routing parameters.
+
+        "a_rout", "mt_rout", "K_rout"
+
+    Step 5: If use_storage=True, keep the other calibrated parameters fixed
+    and optimise storage parameters.
+
+        "fl_storage", "fh_storage", "fw_storage", "fa_storage"
+    '''
+
+    from optimisation_updated import optimise3_deap
+    from optimisation_updated import prepare_obs_sim_series3
+    from optimisation_updated import objective_from_series
+    from optimisation_updated import save_optimisation_results3_full
+
+    # -----------------------------------------------------
+    # Read Optimisation 3 settings from TOML
+    # -----------------------------------------------------
+    erosion3_cfg = cfg.get("erosion3_optimization", None)
+
+    if erosion3_cfg is None:
+        objective3 = "log_rmse"
+        cold_region3 = cold_region
+        zero_landcover_class0 = True
+        optimize_hill_routing_params = False
+
+        optimise_only_erosion = cfg_list_or_none(
+            cfg["erosion1b_optimization"],
+            "optimize_only"
+        )
+
+        optimise_only_routing = cfg_list_or_none(
+            cfg["erosion2_optimization"],
+            "optimize_only"
+        )
+
+        number_fractions = 3
+
+        n_generations3 = cfg["erosion2_optimization"].get("n_generations", 10)
+        population_size3 = cfg["erosion2_optimization"].get("population_size", 10)
+        cxpb3 = cfg["erosion2_optimization"].get("cxpb", 0.6)
+        mutpb3 = cfg["erosion2_optimization"].get("mutpb", 0.3)
+        eta3 = cfg["erosion2_optimization"].get("eta", 20.0)
+        seed3 = cfg["erosion2_optimization"].get("seed", 42)
+        checkpoint_path3 = "optimise3_deap_checkpoint.pkl"
+        early_stop_rounds3 = cfg["erosion2_optimization"].get("early_stop_rounds", 5)
+        early_stop_tol3 = cfg["erosion2_optimization"].get("early_stop_tol", 1e-4)
+
+    else:
+        objective3 = erosion3_cfg.get("objective", "log_rmse")
+        cold_region3 = erosion3_cfg.get("cold_region", cold_region)
+        zero_landcover_class0 = erosion3_cfg.get("zero_landcover_class0", True)
+        optimize_hill_routing_params = erosion3_cfg.get(
+            "optimize_hill_routing_params",
+            True
+        )
+
+        optimise_only_erosion = cfg_list_or_none(
+            erosion3_cfg,
+            "optimise_only_erosion"
+        )
+
+        optimise_only_routing = cfg_list_or_none(
+            erosion3_cfg,
+            "optimise_only_routing"
+        )
+
+        number_fractions = erosion3_cfg.get("number_fractions", 3)
+
+        n_generations3 = erosion3_cfg.get("n_generations", 10)
+        population_size3 = erosion3_cfg.get("population_size", 10)
+        cxpb3 = erosion3_cfg.get("cxpb", 0.6)
+        mutpb3 = erosion3_cfg.get("mutpb", 0.3)
+        eta3 = erosion3_cfg.get("eta", 20.0)
+        seed3 = erosion3_cfg.get("seed", 42)
+        checkpoint_path3 = erosion3_cfg.get(
+            "checkpoint_path",
+            "optimise3_deap_checkpoint.pkl"
+        )
+        early_stop_rounds3 = erosion3_cfg.get("early_stop_rounds", 5)
+        early_stop_tol3 = erosion3_cfg.get("early_stop_tol", 1e-4)
+
+    # -----------------------------------------------------
+    # Run Optimisation 3
+    # -----------------------------------------------------
+    optimised_param_dict3, best_score3, pop3, logbook3, hof3 = optimise3_deap(
+        param_dict=param_dict,
+        model_input=model_input,
+        df_runoff=df_runoff,
+        rain=rain,
+        df_swe=df_swe,
+        sand_hru_stat=sand_hru_stat,
+        silt_hru_stat=silt_hru_stat,
+        river_gdf=river_gdf,
+        sediment_size=sediment_size,
+        toml_file=routing_constants_toml,
+        h=h,
+        q=q,
+        Q=Q,
+        width=width,
+        df_SSC_obs=df_SSC_obs,
+        use_storage=use_storage,
+        river_storage=river_storage,
+        storage_data_type=storage_data_type,
+        obs_time_col="time",
+        obs_value_col="SSC",
+        objective=objective3,
+        cold_region=cold_region3,
+        zero_landcover_class0=zero_landcover_class0,
+        optimize_routing_params=optimize_hill_routing_params,
+        optimise_only_erosion=optimise_only_erosion,
+        optimise_only_routing=optimise_only_routing,
+        number_fractions=number_fractions,
+        n_generations=n_generations3,
+        population_size=population_size3,
+        cxpb=cxpb3,
+        mutpb=mutpb3,
+        eta=eta3,
+        seed=seed3,
+        checkpoint_path=checkpoint_path3,
+        early_stop_rounds=early_stop_rounds3,
+        early_stop_tol=early_stop_tol3
     )
 
-    optimise_only_erosion = cfg_list_or_none(
-        erosion3_cfg,
-        "optimise_only_erosion"
+    # -----------------------------------------------------
+    # Final objective check
+    # -----------------------------------------------------
+    obs3, sim3 = prepare_obs_sim_series3(
+        param_dict=optimised_param_dict3,
+        model_input=model_input,
+        df_runoff=df_runoff,
+        rain=rain,
+        df_swe=df_swe,
+        sand_hru_stat=sand_hru_stat,
+        silt_hru_stat=silt_hru_stat,
+        river_gdf=river_gdf,
+        sediment_size=sediment_size,
+        toml_file=routing_constants_toml,
+        h=h,
+        q=q,
+        Q=Q,
+        width=width,
+        df_SSC_obs=df_SSC_obs,
+        obs_time_col="time",
+        obs_value_col="SSC",
+        cold_region=cold_region3,
+        zero_landcover_class0=zero_landcover_class0,
+        number_fractions=number_fractions,
+        use_storage=use_storage,
+        river_storage=river_storage,
+        storage_data_type=storage_data_type
     )
 
-    optimise_only_routing = cfg_list_or_none(
-        erosion3_cfg,
-        "optimise_only_routing"
+    final_score3 = objective_from_series(
+        obs3,
+        sim3,
+        objective=objective3
     )
 
-    number_fractions = erosion3_cfg.get("number_fractions", 3)
+    print("Optimisation 3 best score:", best_score3)
+    print("Final combined optimisation objective:", final_score3)
 
-    n_generations3 = erosion3_cfg.get("n_generations", 10)
-    population_size3 = erosion3_cfg.get("population_size", 10)
-    cxpb3 = erosion3_cfg.get("cxpb", 0.6)
-    mutpb3 = erosion3_cfg.get("mutpb", 0.3)
-    eta3 = erosion3_cfg.get("eta", 20.0)
-    seed3 = erosion3_cfg.get("seed", 42)
-    checkpoint_path3 = erosion3_cfg.get(
-        "checkpoint_path",
-        "optimise3_deap_checkpoint.pkl"
+    # -----------------------------------------------------
+    # Save Optimisation 3 full results
+    # -----------------------------------------------------
+    save_optimisation_results3_full(
+        optimised_param_dict=optimised_param_dict3,
+        best_score=best_score3,
+        pop=pop3,
+        logbook=logbook3,
+        hof=hof3,
+
+        # Erosion model inputs
+        model_input=model_input,
+        df_runoff=df_runoff,
+        rain=rain,
+        cat_hru=cat_hru,
+        df_SSC_obs=df_SSC_obs,
+        sand_hru_stat=sand_hru_stat,
+        silt_hru_stat=silt_hru_stat,
+
+        # TempSedRout inputs
+        river_gdf=river_gdf,
+        sediment_size=sediment_size,
+        toml_file=routing_constants_toml,
+        h=h,
+        q=q,
+        Q=Q,
+        width=width,
+
+        output_dir=output_dir,
+        file_name=final_file_name3,
+        obs_time_col="time",
+        obs_value_col="SSC",
+        zero_landcover_class0=zero_landcover_class0,
+        number_fractions=number_fractions,
+        df_swe=df_swe,
+        cold_region=cold_region3,
+        use_storage=use_storage,
+        river_storage=river_storage,
+        storage_data_type=storage_data_type
     )
-    early_stop_rounds3 = erosion3_cfg.get("early_stop_rounds", 5)
-    early_stop_tol3 = erosion3_cfg.get("early_stop_tol", 1e-4)
 
-# -----------------------------------------------------
-# Run Optimisation 3
-# -----------------------------------------------------
-optimised_param_dict3, best_score3, pop3, logbook3, hof3 = optimise3_deap(
-    param_dict=param_dict,
-    model_input=model_input,
-    df_runoff=df_runoff,
-    rain=rain,
-    df_swe=df_swe,
-    sand_hru_stat=sand_hru_stat,
-    silt_hru_stat=silt_hru_stat,
-    river_gdf=river_gdf,
-    sediment_size=sediment_size,
-    toml_file=routing_constants_toml,
-    h=h,
-    q=q,
-    Q=Q,
-    width=width,
-    df_SSC_obs=df_SSC_obs,
-    use_storage=use_storage,
-    river_storage=river_storage,
-    storage_data_type=storage_data_type,
-    obs_time_col="time",
-    obs_value_col="SSC",
-    objective=objective3,
-    cold_region=cold_region3,
-    zero_landcover_class0=zero_landcover_class0,
-    optimize_routing_params=optimize_hill_routing_params,
-    optimise_only_erosion=optimise_only_erosion,
-    optimise_only_routing=optimise_only_routing,
-    number_fractions=number_fractions,
-    n_generations=n_generations3,
-    population_size=population_size3,
-    cxpb=cxpb3,
-    mutpb=mutpb3,
-    eta=eta3,
-    seed=seed3,
-    checkpoint_path=checkpoint_path3,
-    early_stop_rounds=early_stop_rounds3,
-    early_stop_tol=early_stop_tol3
-)
-
-# -----------------------------------------------------
-# Final objective check
-# -----------------------------------------------------
-obs3, sim3 = prepare_obs_sim_series3(
-    param_dict=optimised_param_dict3,
-    model_input=model_input,
-    df_runoff=df_runoff,
-    rain=rain,
-    df_swe=df_swe,
-    sand_hru_stat=sand_hru_stat,
-    silt_hru_stat=silt_hru_stat,
-    river_gdf=river_gdf,
-    sediment_size=sediment_size,
-    toml_file=routing_constants_toml,
-    h=h,
-    q=q,
-    Q=Q,
-    width=width,
-    df_SSC_obs=df_SSC_obs,
-    obs_time_col="time",
-    obs_value_col="SSC",
-    cold_region=cold_region3,
-    zero_landcover_class0=zero_landcover_class0,
-    number_fractions=number_fractions,
-    use_storage=use_storage,
-    river_storage=river_storage,
-    storage_data_type=storage_data_type
-)
-
-final_score3 = objective_from_series(
-    obs3,
-    sim3,
-    objective=objective3
-)
-
-print("Optimisation 3 best score:", best_score3)
-print("Final combined optimisation objective:", final_score3)
-
-# -----------------------------------------------------
-# Save Optimisation 3 full results
-# -----------------------------------------------------
-save_optimisation_results3_full(
-    optimised_param_dict=optimised_param_dict3,
-    best_score=best_score3,
-    pop=pop3,
-    logbook=logbook3,
-    hof=hof3,
-
-    # Erosion model inputs
-    model_input=model_input,
-    df_runoff=df_runoff,
-    rain=rain,
-    cat_hru=cat_hru,
-    df_SSC_obs=df_SSC_obs,
-    sand_hru_stat=sand_hru_stat,
-    silt_hru_stat=silt_hru_stat,
-
-    # TempSedRout inputs
-    river_gdf=river_gdf,
-    sediment_size=sediment_size,
-    toml_file=routing_constants_toml,
-    h=h,
-    q=q,
-    Q=Q,
-    width=width,
-
-    output_dir=output_dir,
-    file_name=final_file_name3,
-    obs_time_col="time",
-    obs_value_col="SSC",
-    zero_landcover_class0=zero_landcover_class0,
-    number_fractions=number_fractions,
-    df_swe=df_swe,
-    cold_region=cold_region3,
-    use_storage=use_storage,
-    river_storage=river_storage,
-    storage_data_type=storage_data_type
-)
-
-print("Saved Optimisation 3 full results using file name:", final_file_name3)
+    print("Saved Optimisation full results using file name:", final_file_name3)
