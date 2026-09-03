@@ -1,1 +1,136 @@
+name: Research Code Review
+description: Complete a code review and reproducibility assessment
+title: "[Code Review]: "
+labels:
+  - code-review
 
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Complete this form after reviewing the code and testing reproducibility.
+        Detailed technical comments should also be recorded in the Pull Request.
+
+  - type: input
+    id: project
+    attributes:
+      label: Project or code name
+      placeholder: "Example: SedHydro"
+    validations:
+      required: true
+
+  - type: input
+    id: developer
+    attributes:
+      label: Developer
+    validations:
+      required: true
+
+  - type: input
+    id: reviewers
+    attributes:
+      label: Reviewer(s)
+    validations:
+      required: true
+
+  - type: input
+    id: repository
+    attributes:
+      label: GitHub repository
+      placeholder: https://github.com/username/repository
+    validations:
+      required: true
+
+  - type: input
+    id: pull_request
+    attributes:
+      label: Pull Request number or link
+      placeholder: "Example: #12"
+
+  - type: input
+    id: commit
+    attributes:
+      label: Commit ID reviewed
+
+  - type: checkboxes
+    id: repository_preparation
+    attributes:
+      label: Repository preparation
+      options:
+        - label: README and installation instructions are provided
+        - label: Required dependencies are documented
+        - label: Inputs and expected outputs are described
+        - label: Example configuration or reduced test case is included where applicable
+        - label: Version history is maintained using Git
+
+  - type: checkboxes
+    id: code_review
+    attributes:
+      label: Code review
+      options:
+        - label: Code is well organised and easy to understand
+        - label: Documentation is adequate
+        - label: Scientific and computational implementation appears correct
+        - label: Code structure and workflow are logical
+
+  - type: textarea
+    id: review_comments
+    attributes:
+      label: Review comments
+      description: Summarise important comments or refer to the Pull Request.
+      placeholder: Enter comments here
+
+  - type: checkboxes
+    id: reproducibility
+    attributes:
+      label: Reproducibility test
+      options:
+        - label: Repository was cloned successfully
+        - label: Software environment was created successfully
+        - label: Required dependencies were installed successfully
+        - label: Example workflow completed successfully
+        - label: Expected results were reproduced
+        - label: No undocumented instructions were required
+
+  - type: textarea
+    id: reproducibility_comments
+    attributes:
+      label: Errors or undocumented requirements
+      placeholder: Describe any errors, missing steps, or differences
+
+  - type: dropdown
+    id: outcome
+    attributes:
+      label: Review outcome
+      options:
+        - Approved
+        - Approved with minor revisions
+        - Revisions required
+    validations:
+      required: true
+
+  - type: textarea
+    id: required_actions
+    attributes:
+      label: Required actions
+      placeholder: List any actions required before approval
+
+  - type: checkboxes
+    id: final_verification
+    attributes:
+      label: Final verification
+      options:
+        - label: Required comments were addressed
+        - label: Pull Request was approved
+        - label: Code-review branch was merged into main
+
+  - type: input
+    id: final_commit
+    attributes:
+      label: Final commit ID
+
+  - type: input
+    id: completion_date
+    attributes:
+      label: Review completion date
+      placeholder: YYYY-MM-DD
