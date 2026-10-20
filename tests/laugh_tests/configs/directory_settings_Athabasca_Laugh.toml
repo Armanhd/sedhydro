@@ -1,0 +1,272 @@
+# =========================================================
+# model settings
+# =========================================================
+[settings]
+start_date = "2021-06-01"
+end_date = "2021-06-30"
+cell_size = 4000
+cold_region=true
+# "calibration" --> optimise model parameters; "validation" --> use optimised parameters and validation period
+model_mode="validation"
+
+# =========================================================
+# Shared common directories
+# =========================================================
+[common]
+# working directory
+working_directory_mac = "/Users/armanhaddadchi/Library/CloudStorage/OneDrive-UniversityofCalgary/ErosionModel/git_SedHydro"
+working_directory_win = "C:/Users/Arman/OneDrive - University of Calgary/ErosionModel/git_SedHydro"
+working_directory_linux = "/work/comphyd_lab/users/arman.haddadchi/SedHydro"
+
+# main directory for hydrological model run
+main_directory_mac = "/Users/armanhaddadchi/Library/CloudStorage/OneDrive-UniversityofCalgary/Share_with-Frank"
+main_directory_win = "C:/Users/Arman/OneDrive - University of Calgary/Share_with-Frank"
+main_directory_linux = "/work/comphyd_lab/users/arman.haddadchi/SedHydro/data/hydrology"
+
+# folder name for running catchment --> Athabasca River (07DD001)
+catchment_folder = "Athabasca_river_whole"
+
+# main directory for routing hydrological model
+main_dir_routing_mac = "/Users/armanhaddadchi/Library/CloudStorage/OneDrive-UniversityofCalgary/ErosionModel/git_SedHydro/TempSedRout"
+main_dir_routing_win = "C:/Users/Arman/OneDrive - University of Calgary/ErosionModel/git_SedHydro/TempSedRout"
+main_dir_routing_linux = "/work/comphyd_lab/users/arman.haddadchi/SedHydro/TempSedRout"
+
+# initial model coefficients for param_dict
+coefs_path_mac = "/Users/armanhaddadchi/Library/CloudStorage/OneDrive-UniversityofCalgary/ErosionModel/git_SedHydro/settings/Coeffs_Athabasca.csv"
+coefs_path_win = "C:/Users/Arman/OneDrive - University of Calgary/ErosionModel/git_SedHydro/settings/Coeffs_Athabasca.csv"
+coefs_path_linux = "/work/comphyd_lab/users/arman.haddadchi/SedHydro/settings/Coeffs_Athabasca.csv"
+
+
+# =========================================================
+# ========== directory for specific catchment======
+# =========================================================
+[catchment]
+# read hydrological model setting: SUMMA
+setting_directory = "settings/SUMMA/modelDecisions.txt"
+
+# catchment shapefile directory
+cat_shp_path = "shapefiles/catchment/semidistributed/run_1/Athabasca_sedi_3_HRUs_GRUs.shp"
+
+# catchment hru directory
+cat_hru_path = "shapefiles/catchment/semidistributed/run_1/Athabasca_sedi_3_HRUs_GRUs.shp"
+
+# read DEM file from SUMMA attributes
+dem_path = "data/attributes/elevation/dem/domain_Athabasca_sedi_3_elv.tif"
+
+# rainfall directory from forcing folder of hydrological model
+rainfall_directory = "forcing/SUMMA_input"
+
+# runoff netcdf file directory from SUMMA
+# SUMMA_path = "results/summa/outputrun_1_timestep_laugh_zero_runoff.nc"
+# SUMMA_path = "results/summa/outputrun_1_timestep_laugh_SWE100.nc"
+SUMMA_path = "results/summa/outputrun_1_timestep.nc"
+
+# river hydrological variables directory from mizuRoute
+mizu_path = "results/mizuroute/channel_geometry_all-athabasca.nc"
+
+# shapefile of river network directory
+river_shp_file ="shapefiles/river_network/Athabasca_sedi_3_riverNetwork_semidistributed.shp"
+
+# =========================================================
+# ============= independent directory=======
+# =========================================================
+[reference]
+# csv file of land cover classes
+landclass_directory_mac = "/Users/armanhaddadchi/Library/CloudStorage/OneDrive-UniversityofCalgary/ErosionModel/Landcover/Landcover_classes.csv"
+landclass_directory_win = "C:/Users/Arman/OneDrive - University of Calgary/ErosionModel/Landcover/Landcover_classes.csv"
+landclass_directory_linux = "/work/comphyd_lab/users/arman.haddadchi/SedHydro/settings/Landcover_classes.csv"
+
+# surficial geology map directory
+geol_path_mac = "/Users/armanhaddadchi/Library/CloudStorage/OneDrive-UniversityofCalgary/ErosionModel/Geology/surficial_geology.tif"
+geol_path_win = "C:/Users/Arman/OneDrive - University of Calgary/ErosionModel/Geology/surficial_geology.tif"
+geol_path_linux = "/work/comphyd_lab/users/arman.haddadchi/SedHydro/data/geology/surficial_geology.tif"
+
+# csv file of geology classes
+geolclass_directory_mac = "/Users/armanhaddadchi/Library/CloudStorage/OneDrive-UniversityofCalgary/ErosionModel/Geology-class.csv"
+geolclass_directory_win = "C:/Users/Arman/OneDrive - University of Calgary/ErosionModel/Geology-class.csv"
+geolclass_directory_linux = "/work/comphyd_lab/users/arman.haddadchi/SedHydro/settings/Geology-class.csv"
+
+# directory for landcover data
+# --> from landcover 2020 class
+landcover_path_mac = "/Users/armanhaddadchi/Library/CloudStorage/OneDrive-UniversityofCalgary/ErosionModel/Landcover/landcover-2020-classification.tif"
+landcover_path_win = "C:/Users/Arman/OneDrive - University of Calgary/ErosionModel/Landcover/landcover-2020-classification.tif"
+landcover_path_linux = "/work/comphyd_lab/users/arman.haddadchi/SedHydro/data/landcover/landcover-2020-classification.tif"
+
+# read soil texture data
+sand_path_mac = "/Users/armanhaddadchi/Library/CloudStorage/OneDrive-UniversityofCalgary/ErosionModel/Soil/Sand_X0_5_cm_100m1980-2000v1.tiff"
+#sand_path_mac = "/Users/armanhaddadchi/Library/CloudStorage/OneDrive-UniversityofCalgary/ErosionModel/Laugh_test/Athabasca_LaughTest3_Sand_equal.tiff"
+sand_path_win = "C:/Users/Arman/OneDrive - University of Calgary/ErosionModel/Soil/Sand_X0_5_cm_100m1980-2000v1.tiff"
+sand_path_linux = "/work/comphyd_lab/users/arman.haddadchi/SedHydro/data/soil/Sand_X0_5_cm_100m1980-2000v1.tiff"
+
+silt_path_mac = "/Users/armanhaddadchi/Library/CloudStorage/OneDrive-UniversityofCalgary/ErosionModel/Soil/Silt_X0_5_cm_100m1980-2000v1.tiff"
+#silt_path_mac = "/Users/armanhaddadchi/Library/CloudStoragse/OneDrive-UniversityofCalgary/ErosionModel/Laugh_test/Athabasca_LaughTest3_Silt_equal.tiff"
+silt_path_win = "C:/Users/Arman/OneDrive - University of Calgary/ErosionModel/Soil/Silt_X0_5_cm_100m1980-2000v1.tiff"
+silt_path_linux = "/work/comphyd_lab/users/arman.haddadchi/SedHydro/data/soil/Silt_X0_5_cm_100m1980-2000v1.tiff"
+
+# riverbed and sediment size class files
+sediment_size_file = "sediment_size_class.csv"
+
+# read directory for config file for TempSedROut as TOML
+routing_constants_toml_mac = "/Users/armanhaddadchi/Library/CloudStorage/OneDrive-UniversityofCalgary/ErosionModel/TempSedRout/constants.toml"
+routing_constants_toml_win = "C:/Users/Arman/OneDrive - University of Calgary/ErosionModel/TempSedRout/constants.toml"
+routing_constants_toml_linux = "/work/comphyd_lab/users/arman.haddadchi/SedHydro/TempSedRout/constants.toml"
+
+
+# =========================================================
+# ============= observed SSC timeseries directory=====
+# =========================================================
+[observed]
+# observed SSC timeseries directory
+observed_path_mac = "/Users/armanhaddadchi/Library/CloudStorage/OneDrive-UniversityofCalgary/ErosionModel/SSC_derived/DerivedSSC_timeseries_loglin_07DD001.csv"
+observed_path_win = "C:/Users/Arman/OneDrive - University of Calgary/ErosionModel/SSC_derived/DerivedSSC_timeseries_loglin_07DD001.csv"
+observed_path_linux = "/work/comphyd_lab/users/arman.haddadchi/SedHydro/data/SSC_derived/DerivedSSC_timeseries_loglin_07DD001.csv"
+
+
+# =========================================================
+# ============= Erosion1b model results for Erosion2=====
+# =========================================================
+[erosion]
+# output directory for model_sed_final from Erosion1b
+# name is: /outputs/[output_model_sed_final_pkl]
+model_sed_final_path_mac = "/Users/armanhaddadchi/Library/CloudStorage/OneDrive-UniversityofCalgary/ErosionModel/outputs/Athabasca_laugh/model_sed_final_runlaugh.pkl"
+model_sed_final_path_win = "C:/Users/Arman/OneDrive - University of Calgary/ErosionModel/outputs/Athabasca_laugh/model_sed_final_runlaugh.pkl"
+
+
+# output directory for model parameters
+# name is: /outputs/[output_optimisation_file_name1b]
+model_parameters_final_path_mac = "/Users/armanhaddadchi/Library/CloudStorage/OneDrive-UniversityofCalgary/ErosionModel/outputs/Athabasca_laugh/optimised1b_final_runlaugh.pkl"
+model_parameters_final_path_win = "C:/Users/Arman/OneDrive - University of Calgary/ErosionModel/outputs/Athabasca_laugh/optimised1b_runlaugh.pkl"
+
+# =========================================================
+# ============= output saving directory======
+# =========================================================
+[output]
+# model output saving directory
+output_dir_mac = "/Users/armanhaddadchi/Library/CloudStorage/OneDrive-UniversityofCalgary/ErosionModel/outputs/Athabasca_laugh"
+output_dir_win = "C:/Users/Arman/OneDrive - University of Calgary/ErosionModel/outputs/Athabasca_laugh"
+
+# filename to save model parameters for Erosion1b [in csv and pkl]
+output_optimisation_file_name1b = "optimised1b_parameters_Athabasca_runlaugh"
+
+# filename to save model_sed [pkl] for Erosion1b
+output_model_sed_final_pkl = "model_sed_final_Athabasca_runlaugh.pkl"
+
+# filename to save model parameters for Erosion2 [in csv and pkl]
+output_optimisation_file_name2 = "optimised2_Athabasca_runlaugh"
+
+output_optimisation_file_name3 = "optimised3_Athabasca_runlaugh"
+
+# =========================================================
+# ============= validation read parameters and saving directory======
+# =========================================================
+[validation]
+
+start_date_validation = "2021-06-01"
+end_date_validation = "2021-06-30"
+
+# read optimised parameters file name for model validation runs
+validation_coefs_path_mac="/Users/armanhaddadchi/Library/CloudStorage/OneDrive-UniversityofCalgary/ErosionModel/outputs/Athabasca_laugh/optimised3_Athabasca_run3_main.csv"
+validation_coefs_path_win="C:/Users/Arman/OneDrive - University of Calgary/ErosionModel/outputs/Athabasca_laugh/optimised3_Athabasca_run3_main.csv"
+validation_coefs_path_linux = "/work/comphyd_lab/users/arman.haddadchi/SedHydro/outputs/Athabasca_laugh/optimised3_Athabasca_run3_main.csv"
+
+
+# filename to save model_sed [pkl] for validation
+# validation_model_sed_final_pkl = "validation_model_sed_final_Athabasca_run_laugh_Test3.pkl"
+#validation_model_sed_final_pkl = "validation_model_sed_final_Athabasca_run_laugh_Test5_area100.pkl"
+# filename to save model outputs for validation [in csv and pkl]
+# validation_file_name = "validation_Athabasca_run_laugh_Test3"
+#validation_file_name = "validation_Athabasca_run_laugh_Test5_area100"
+
+# file name for 116m2
+#validation_model_sed_final_pkl = "validation_model_sed_final_Athabasca_run_laugh_Test5_area0p00001.pkl"
+#validation_file_name = "validation_Athabasca_run_laugh_Test5_area0p00001"
+# 11,600 m2
+validation_model_sed_final_pkl = "validation_model_sed_final_Athabasca_run_laugh_Test5_area0p001.pkl"
+validation_file_name = "validation_Athabasca_run_laugh_Test5_area0p001"
+
+
+# =========================================================
+# ============= Storage data for depressional systems ======
+# =========================================================
+[storage]
+# file name for storage directory
+#storage_file_dir_mac = '/Users/armanhaddadchi/Library/CloudStorage/OneDrive-UniversityofCalgary/ErosionModel/git_SedHydro/TempSedRout/Athabasca_river_depression.csv'
+#storage_file_dir_mac = '/Users/armanhaddadchi/Library/CloudStorage/OneDrive-UniversityofCalgary/ErosionModel/git_SedHydro/TempSedRout/Athabasca_river_depression_Test5_1pct.csv'
+storage_file_dir_mac ='/Users/armanhaddadchi/Library/CloudStorage/OneDrive-UniversityofCalgary/ErosionModel/git_SedHydro/TempSedRout/Athabasca_river_depression_Test5_0p001pct.csv'
+
+storage_file_dir_win = 'C:/Users/Arman/OneDrive - University of Calgary/ErosionModel/git_SedHydro/TempSedRout/Athabasca_river_depression.csv'
+
+# if true use TempSedRout_storage if false use TempSedRout 
+use_storage = true
+
+# type of storage data available: length, width, area
+storage_data_type = "area"
+
+
+# =========================================================
+# Optimisation settings for Erosion3 / combined model
+# optimise_only_routing=[] --> means optimise no TempSedRout parameters.
+# if optimise_only_routing is removed --> optimise all TempSedRout parameters 
+# (Remove this key entirely to pass Python None, which means optimise all eligible TempSedRout parameters.)
+# if optimise_only_routing=["Fd1_TempSedRout", "Fd2_TempSedRout" ] --> optimise only Fd1 and Fd2
+# =========================================================
+[erosion3_optimization]
+objective = "log_rmse"
+cold_region = true
+zero_landcover_class0 = true
+
+# If false, a_rout and mt_rout are excluded even if listed below.
+# If true, a_rout and mt_rout can be optimised if listed below and up > low.
+optimize_hill_routing_params = false
+
+# -------------------------
+# Storage routing options
+# These are read from [storage] in your current ErosionModel3_mp.py,
+# not directly from [erosion3_optimization].
+# Keep them here only as comments/reminders.
+# -------------------------
+
+# -------------------------
+# ErosionModel parameters to optimise
+# -------------------------
+# optimise_only_erosion = [ "al2", "al4", "al5", "bl2", "bl4", "bl5", "ag1", "ag2", "ag3", "ag4","ag5","ag6","ag7","ag8","ag9","ag11","ag12","ag13", "bg1", "bg2", "bg3", "bg4","bg5","bg6","bg7","bg8","bg9","bg11","bg12","bg13"]
+# optimise_only_erosion = ["abase", "bbase", "as", "bs", "ceros", "ksnow"]
+optimise_only_erosion = []
+# -------------------------
+# TempSedRout parameters to optimise
+# -------------------------
+optimise_only_routing = ["dispers1_TempSedRout", "dispers2_TempSedRout", "dispers3_TempSedRout", "Fd1_TempSedRout", "Fd2_TempSedRout", "Fd3_TempSedRout", "cr1_TempSedRout", "cr2_TempSedRout", "cr3_TempSedRout"]
+# optimise_only_routing = []
+
+# -------------------------
+# Sediment fractions
+# -------------------------
+number_fractions = 3
+
+# -------------------------
+# DEAP optimisation settings
+# -------------------------
+n_generations = 25
+population_size = 30
+cxpb = 0.6
+mutpb = 0.3
+eta = 20.0
+seed = 42
+
+# -------------------------
+# Checkpointing
+# -------------------------
+checkpoint_path = "sedhydro_mp_Athabasca_runlaugh_checkpoint.pkl"
+
+# -------------------------
+# Early stopping
+# -------------------------
+early_stop = true
+early_stop_rounds = 8
+early_stop_tol = 0.000001
+
+# -------------------------
+# Multiprocessing
+# -------------------------
+n_cores = 4
+chunksize = 1

@@ -1,0 +1,61 @@
+﻿parameter,default,low_range,up_range,Description,priority
+al0,0,0,0,"# for a - landcover coeff for non-eordible land (e.g., urban, water) ",1
+al1,0,0,0,# for a - landcover coeff for ice and snow,2
+al2,0.5,0.2,2,# for a - landcover coeff for forest,3
+al3,0.6,0.2,2,# for a - landcover coeff for shrub,3
+al4,0.7,0.2,2,# for a - landcover coeff for cropland,3
+al5,0.8,0.2,2,# for a - landcover coeff for barren,3
+ag1,0,0,0,# for a -  geology coeff for non erodible ,1
+ag2,0,0,0,"# for a - geology coeff for R: Bedrock, undifferentiated",2
+ag3,0.2,0.2,2,"# for a - geology coeff for GMv, Tb, Wv",3
+ag4,0.25,0.2,2,"# for a - geology coeff for Tv, W",3
+ag5,0.3,0.2,2,# for a -  geology coeff for GFc,3
+ag6,0.35,0.2,2,# for a - geology coeff for Th,3
+ag7,0.4,0.2,2,# for a - geology coeff for Tm,3
+ag8,0.45,0.2,2,# for a - geology coeff for GFp,3
+ag9,0.5,0.2,2,"# for a - geology coeff for GLn, GMn, Ln, Mn",3
+ag10,0.55,0.2,2,# for a - geology coeff for V,3
+ag11,0.6,0.2,2,"# for a -  geology coeff for A, C, Cv",3
+ag12,0.7,0.2,2,"# for a - geology coeff for Glo, Gmo, Lo, Mo",3
+ag13,0.8,0.2,2,# for a - geology coeff for O,3
+as,0.6,0.1,0.8,# for a - slope coeff,
+abase,0.6,0.01,1,# for a - base factor,
+bl0,0,0,0,"# for b - landcover coeff for non-eordible land (e.g., urban, water) ",1
+bl1,0,0,0,# for b - landcover coeff for ice and snow,2
+bl2,0.3,0.3,1.8,# for b - landcover coeff for forest,3
+bl3,0.35,0.3,1.8,# for b - landcover coeff for shrub,3
+bl4,0.4,0.3,1.8,# for b - landcover coeff for cropland,3
+bl5,0.5,0.3,1.8,# for b - landcover coeff for barren,3
+bg1,0.3,0.3,1.8,# for b -  geology coeff for non erodible ,1
+bg2,0.35,0.3,1.8,"# for b - geology coeff for R: Bedrock, undifferentiated",2
+bg3,0.37,0.3,1.8,"# for b - geology coeff for GMv, Tb, Wv",3
+bg4,0.38,0.3,1.8,"# for b - geology coeff for Tv, W",3
+bg5,0.39,0.3,1.8,# for b -  geology coeff for GFc,3
+bg6,0.4,0.3,1.8,# for b - geology coeff for Th,3
+bg7,0.41,0.3,1.8,# for b - geology coeff for Tm,3
+bg8,0.42,0.3,1.8,# for b - geology coeff for GFp,3
+bg9,0.43,0.3,1.8,"# for b - geology coeff for GLn, GMn, Ln, Mn",3
+bg10,0.44,0.3,1.8,# for b - geology coeff for V,3
+bg11,0.45,0.3,1.8,"# for b -  geology coeff for b, C, Cv",3
+bg12,0.46,0.3,1.8,"# for b - geology coeff for Glo, Gmo, Lo, Mo",3
+bg13,0.47,0.3,1.8,# for b - geology coeff for O,3
+bs,0.4,0,0.7,# for b - slope coeff,
+bbase,0.5,0.2,1.5,# for b - base factor,
+ceros,0.7,0.001,1,# for rain - erosivity coefficient,
+ksnow,0.05,0.01,0.1,# for snow - attenuation coefficient,
+a_rout,3,1,6,# shape parameter of gamma distribution for SSC_hru routing,
+mt_rout,12,1,24,# mean travel time parameter of gamma distribution for SSC_hru routing,
+K_rout,250,50,1000,# routing length (days),
+dispers1_TempSedRout,250,50,500,# dispersion coefficient for all fractions,
+dispers2_TempSedRout,250,50,500,# dispersion coefficient for all fractions,
+dispers3_TempSedRout,250,50,500,# dispersion coefficient for all fractions,
+Fd1_TempSedRout,5.00E-08,1.00E-09,1.00E-07,# F coefficient for fraction d1 in TempSedRout entrainment rate,
+Fd2_TempSedRout,5.00E-08,1.00E-09,1.00E-07,# F coefficient for fraction d2 in TempSedRout entrainment rate,
+Fd3_TempSedRout,5.00E-08,1.00E-09,1.00E-07,# F coefficient for fraction d3 in TempSedRout entrainment rate,
+cr1_TempSedRout,8,1,50,# critical stream power coefficient for fraction d1,
+cr2_TempSedRout,8,1,50,# critical stream power coefficient for fraction d2,
+cr3_TempSedRout,8,1,50,# critical stream power coefficient for fraction d3,
+fl_storage,1,0.1,5,# storage coefficient for length required in TempSedRout_storage,
+fh_storage,1,0.1,5,# storage coefficient for depth required in TempSedRout_storage,
+fw_storage,1,0.1,5,# storage coefficient for width required in TempSedRout_storage,
+fa_storage,1,0.1,5,# storage coefficient for area required in TempSedRout_storage,

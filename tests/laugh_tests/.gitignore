@@ -1,0 +1,10 @@
+# Large input datasets
+data/*
+!data/.gitkeep
+
+# Python temporary files
+__pycache__/
+*.pyc
+
+# macOS files
+.DS_Store
