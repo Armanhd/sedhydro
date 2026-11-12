@@ -34,12 +34,12 @@ from netCDF4 import Dataset, num2date
 # CONFIG FILE
 # =====================================================
 
-toml_file = "/Users/armanhaddadchi/Library/CloudStorage/OneDrive-UniversityofCalgary/ErosionModel/git_SedHydro/directory_settings_Notikenwin_validation.toml"
+#toml_file = "/Users/armanhaddadchi/Library/CloudStorage/OneDrive-UniversityofCalgary/ErosionModel/git_SedHydro/directory_settings_Smoky_validation.toml"
 
-# if len(sys.argv) > 1:
-#     toml_file = sys.argv[1]
-# else:
-#     toml_file = "directory_settings_Smoky_validation.toml"
+if len(sys.argv) > 1:
+    toml_file = sys.argv[1]
+else:
+    toml_file = "directory_settings_Smoky_validation.toml"
 # =====================================================
 # SMALL HELPERS
 # =====================================================
@@ -538,7 +538,7 @@ from utils import forcingnc_to_dict_by_hru
 
 rain = forcingnc_to_dataframe(
     directory=os.path.join(catchment_path,rainfall_directory),
-    var_name="precipitation_flux",  # "pptrate" "precipitation_flux"
+    var_name="pptrate",  # "pptrate" "precipitation_flux"
     time_name="time",
     hru_name="hruId",
     start_date=start_date,
@@ -549,7 +549,7 @@ rain = forcingnc_to_dataframe(
 
 rain_dict=forcingnc_to_dict_by_hru(
     os.path.join(catchment_path,rainfall_directory),
-    var_name="precipitation_flux",# "pptrate" "precipitation_flux"
+    var_name="pptrate",# "pptrate" "precipitation_flux"
     time_name="time",
     hru_name="hruId",
     start_date=start_date,
@@ -996,8 +996,8 @@ if model_mode == "validation":
     from optimisation_updated import build_model_sed_from_params
     from optimisation_updated import add_time_columns_to_model
     from optimisation_updated import calculate_grid_ssc
-    # from optimisation_updated import save_validation_results3_full
-    from optimisation_updated import save_validation_results3_basic
+    from optimisation_updated import save_validation_results3_full
+    # from optimisation_updated import save_validation_results3_basic
 
     from utils import compute_hru_ssc_from_grids_pergridrunoff
     from utils import route_ssc_hru_gamma
@@ -1119,42 +1119,12 @@ if model_mode == "validation":
         id_col="LINKNO"
     )
 
-    # #save basic validation/calibration-style outputs
-    validation_outputs3 = save_validation_results3_basic(
-        param_dict=param_dict,
-        model_input=model_input,
-        df_runoff=df_runoff,
-        rain=rain,
-        df_SSC_obs=df_SSC_obs,
-        sand_hru_stat=sand_hru_stat,
-        silt_hru_stat=silt_hru_stat,
-        river_gdf=river_gdf,
-        sediment_size=sediment_size,
-        toml_file=routing_constants_toml,
-        h=h,
-        q=q,
-        Q=Q,
-        width=width,
-        output_dir=output_dir,
-        file_name=final_file_name3,
-        obs_time_col="time",
-        obs_value_col="SSC",
-        zero_landcover_class0=True,
-        number_fractions=number_fractions,
-        df_swe=df_swe,
-        cold_region=cold_region,
-        use_storage=use_storage,
-        river_storage=river_storage,
-        storage_data_type=storage_data_type
-    )
-
-    # save full validation/calibration-style outputs
-    # validation_outputs3 = save_validation_results3_full(
+    # save basic validation/calibration-style outputs
+    # validation_outputs3 = save_validation_results3_basic(
     #     param_dict=param_dict,
     #     model_input=model_input,
     #     df_runoff=df_runoff,
     #     rain=rain,
-    #     cat_hru=cat_hru,
     #     df_SSC_obs=df_SSC_obs,
     #     sand_hru_stat=sand_hru_stat,
     #     silt_hru_stat=silt_hru_stat,
@@ -1167,7 +1137,6 @@ if model_mode == "validation":
     #     width=width,
     #     output_dir=output_dir,
     #     file_name=final_file_name3,
-    #     model_sed_pkl_name=final_model_sed_final_pkl,
     #     obs_time_col="time",
     #     obs_value_col="SSC",
     #     zero_landcover_class0=True,
@@ -1176,9 +1145,40 @@ if model_mode == "validation":
     #     cold_region=cold_region,
     #     use_storage=use_storage,
     #     river_storage=river_storage,
-    #     storage_data_type=storage_data_type,
-    #     objective="log_rmse"
+    #     storage_data_type=storage_data_type
     # )
+
+    # save full validation/calibration-style outputs
+    validation_outputs3 = save_validation_results3_full(
+        param_dict=param_dict,
+        model_input=model_input,
+        df_runoff=df_runoff,
+        rain=rain,
+        cat_hru=cat_hru,
+        df_SSC_obs=df_SSC_obs,
+        sand_hru_stat=sand_hru_stat,
+        silt_hru_stat=silt_hru_stat,
+        river_gdf=river_gdf,
+        sediment_size=sediment_size,
+        toml_file=routing_constants_toml,
+        h=h,
+        q=q,
+        Q=Q,
+        width=width,
+        output_dir=output_dir,
+        file_name=final_file_name3,
+        model_sed_pkl_name=final_model_sed_final_pkl,
+        obs_time_col="time",
+        obs_value_col="SSC",
+        zero_landcover_class0=True,
+        number_fractions=number_fractions,
+        df_swe=df_swe,
+        cold_region=cold_region,
+        use_storage=use_storage,
+        river_storage=river_storage,
+        storage_data_type=storage_data_type,
+        objective="log_rmse"
+    )
 
     print("Saved validation full results using file name:", final_file_name3)
 

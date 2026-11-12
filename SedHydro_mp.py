@@ -34,12 +34,18 @@ import rasterio
 # =========================================================
 # 2) CONFIG FILE
 # =========================================================
-toml_file = 'directory_settings_Hay.toml'
 
-# if len(sys.argv) > 1:
-#     toml_file = sys.argv[1]
-# else:
-#     toml_file = "directory_settings_Hay.toml"
+# Read TOML filename from command line.
+# If none is provided, use the default configuration.
+
+if len(sys.argv) > 1:
+    toml_file = sys.argv[1]
+else:
+    toml_file = "directory_settings.toml"
+
+print("========================================================")
+print(f"SedHydro configuration: {toml_file}")
+print("========================================================")
 
 # =========================================================
 # 3) SMALL SAFE HELPERS
@@ -406,7 +412,7 @@ def main():
     # -----------------------------------------------------
     rain = forcingnc_to_dataframe(
         directory=os.path.join(catchment_path, rainfall_directory),
-        var_name="precipitation_flux", # "pptrate" "precipitation_flux"
+        var_name="pptrate", # "pptrate" "precipitation_flux"
         time_name="time",
         hru_name="hruId",
         start_date=start_date,
@@ -648,7 +654,10 @@ def main():
         mutpb = cfg["erosion2_optimization"]["mutpb"]
         eta = cfg["erosion2_optimization"]["eta"]
         seed = cfg["erosion2_optimization"]["seed"]
-        checkpoint_path = "optimise3_deap_mp_checkpoint.pkl"
+        checkpoint_path = os.path.join(
+            output_dir,
+            f"optimise3_deap_mp_{catchment_folder}_checkpoint.pkl"
+        )
         early_stop = cfg["erosion2_optimization"]["early_stop"]
         early_stop_rounds = cfg["erosion2_optimization"]["early_stop_rounds"]
         early_stop_tol = cfg["erosion2_optimization"]["early_stop_tol"]
@@ -678,7 +687,10 @@ def main():
         seed = erosion3_cfg.get("seed", 42)
         checkpoint_path = erosion3_cfg.get(
             "checkpoint_path",
-            "optimise3_deap_mp_checkpoint.pkl"
+            os.path.join(
+                output_dir,
+                f"optimise3_deap_mp_{catchment_folder}_checkpoint.pkl"
+            )
         )
         early_stop = erosion3_cfg.get("early_stop", False)
         early_stop_rounds = erosion3_cfg.get("early_stop_rounds", 10)
@@ -686,9 +698,22 @@ def main():
         n_cores = erosion3_cfg.get("n_cores", None)
         chunksize = erosion3_cfg.get("chunksize", 1)
         
-        slurm_cpus = os.getenv("SLURM_CPUS_PER_TASK")
-        if slurm_cpus is not None:
-            n_cores = int(slurm_cpus)
+        #slurm_cpus = os.getenv("SLURM_CPUS_PER_TASK")
+        #if slurm_cpus is not None:
+        #    n_cores = int(slurm_cpus)
+
+    # Use the Slurm CPU allocation for both optimisation configurations.
+    slurm_cpus = os.getenv("SLURM_CPUS_PER_TASK")
+
+    if slurm_cpus is not None:
+        n_cores = int(slurm_cpus)
+    elif n_cores is None:
+        n_cores = os.cpu_count() or 1
+
+    n_cores = max(1, int(n_cores))
+
+    print(f"SedHydro multiprocessing workers: {n_cores}")
+
     # If routing list is empty in TOML, optimise all eligible TempSedRout parameters.
 
     # -----------------------------------------------------

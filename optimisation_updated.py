@@ -194,7 +194,82 @@ def routing_gamma(qinst, a, mt, K, dt):
 
     return qrouted
 
+#%
+def route_ssc_hru_gamma(SSC_hru, a, mt, K, hru_col="HRU_ID"):
+    """
+    Route SSC time series for each HRU using gamma routing.
 
+    Parameters
+    ----------
+    SSC_hru : pd.DataFrame
+        Wide dataframe with one row per HRU and timestep columns like:
+        HRU_ID, t_20200101_010000, t_20200101_020000, ...
+
+    a : float
+        Shape parameter of gamma distribution.
+
+    mt : float
+        Mean travel time / delay of the gamma routing function.
+        Must use the same time unit as dt (e.g., hours if dt is hours).
+
+    K : int
+        Routing length in number of time steps used in convolution.
+
+    hru_col : str, default="HRU_ID"
+        Name of HRU identifier column.
+
+    Returns
+    -------
+    SSC_hru_routed : pd.DataFrame
+        Same-style dataframe as SSC_hru, with routed SSC values.
+
+    Notes
+    -----
+    The routing is applied independently to each HRU row:
+
+        SSC_routed_j(t) = sum_k [ w(k) * SSC_j(t-k) ]
+
+    where w(k) are discrete gamma-distribution routing weights.
+
+    The timestep dt is inferred from the first two timestep columns:
+        dt = time[1] - time[0]
+
+    dt is converted to hours before passing to routing_gamma, so mt should
+    also be provided in hours.
+    """
+
+    # 1) identify timestep columns
+    time_cols = [c for c in SSC_hru.columns if c.startswith("t_")]
+    if len(time_cols) < 2:
+        raise ValueError("SSC_hru must contain at least two timestep columns.")
+
+    # 2) infer dt from first two timestep columns
+    times = pd.to_datetime(
+        [c.replace("t_", "") for c in time_cols],
+        format="%Y%m%d_%H%M%S"
+    )
+    dt_hours = (times[1] - times[0]).total_seconds() / 3600.0
+
+    # 3) copy structure
+    SSC_hru_routed = SSC_hru[[hru_col] + time_cols].copy()
+
+    # 4) route each HRU row
+    ssc_values = SSC_hru[time_cols].to_numpy(dtype=float)
+    routed_values = np.zeros_like(ssc_values, dtype=float)
+
+    for i in range(ssc_values.shape[0]):
+        routed_values[i, :] = routing_gamma(
+            qinst=ssc_values[i, :],
+            a=a,
+            mt=mt,
+            K=K,
+            dt=dt_hours
+        )
+
+    # 5) put back into dataframe
+    SSC_hru_routed.loc[:, time_cols] = routed_values
+
+    return SSC_hru_routed
 def build_model_sed_from_params(param_dict, model_input):
     """
     Build erosion model coefficients from calibrated parameter values.
@@ -597,13 +672,13 @@ def calculate_grid_ssc(
     rain2["time"] = pd.to_datetime(rain2["time"]).dt.round("h")
 
     erain = 10.0 * rain2.loc[
-        rain2["precipitation_flux"] > 0, "precipitation_flux" #"pptrate  "precipitation_flux"
+        rain2["pptrate"] > 0, "pptrate" #"pptrate  "precipitation_flux"
     ].min()
 
     rain_wide = rain2.pivot_table(
         index="hruId",
         columns="time",
-        values="precipitation_flux", #"pptrate" "precipitation_flux"
+        values="pptrate", #"pptrate" "precipitation_flux"
         aggfunc="first"
     )
 
@@ -2951,82 +3026,7 @@ def compute_hru_ssc_from_grids_pergridrunoff(
 
     return SSC_hru_long
 
-#%
-def route_ssc_hru_gamma(SSC_hru, a, mt, K, hru_col="HRU_ID"):
-    """
-    Route SSC time series for each HRU using gamma routing.
 
-    Parameters
-    ----------
-    SSC_hru : pd.DataFrame
-        Wide dataframe with one row per HRU and timestep columns like:
-        HRU_ID, t_20200101_010000, t_20200101_020000, ...
-
-    a : float
-        Shape parameter of gamma distribution.
-
-    mt : float
-        Mean travel time / delay of the gamma routing function.
-        Must use the same time unit as dt (e.g., hours if dt is hours).
-
-    K : int
-        Routing length in number of time steps used in convolution.
-
-    hru_col : str, default="HRU_ID"
-        Name of HRU identifier column.
-
-    Returns
-    -------
-    SSC_hru_routed : pd.DataFrame
-        Same-style dataframe as SSC_hru, with routed SSC values.
-
-    Notes
-    -----
-    The routing is applied independently to each HRU row:
-
-        SSC_routed_j(t) = sum_k [ w(k) * SSC_j(t-k) ]
-
-    where w(k) are discrete gamma-distribution routing weights.
-
-    The timestep dt is inferred from the first two timestep columns:
-        dt = time[1] - time[0]
-
-    dt is converted to hours before passing to routing_gamma, so mt should
-    also be provided in hours.
-    """
-
-    # 1) identify timestep columns
-    time_cols = [c for c in SSC_hru.columns if c.startswith("t_")]
-    if len(time_cols) < 2:
-        raise ValueError("SSC_hru must contain at least two timestep columns.")
-
-    # 2) infer dt from first two timestep columns
-    times = pd.to_datetime(
-        [c.replace("t_", "") for c in time_cols],
-        format="%Y%m%d_%H%M%S"
-    )
-    dt_hours = (times[1] - times[0]).total_seconds() / 3600.0
-
-    # 3) copy structure
-    SSC_hru_routed = SSC_hru[[hru_col] + time_cols].copy()
-
-    # 4) route each HRU row
-    ssc_values = SSC_hru[time_cols].to_numpy(dtype=float)
-    routed_values = np.zeros_like(ssc_values, dtype=float)
-
-    for i in range(ssc_values.shape[0]):
-        routed_values[i, :] = routing_gamma(
-            qinst=ssc_values[i, :],
-            a=a,
-            mt=mt,
-            K=K,
-            dt=dt_hours
-        )
-
-    # 5) put back into dataframe
-    SSC_hru_routed.loc[:, time_cols] = routed_values
-
-    return SSC_hru_routed
 
 #%
 def create_ssc_hru_fraction_dict(

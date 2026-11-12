@@ -1345,10 +1345,23 @@ def forcingnc_to_dataframe(
 
         try:
             with Dataset(full_path, 'r') as ds:
-                # Use parameterized variable names
+
+                # Select precipitation variable available in this NetCDF file.
+                # Prefer pptrate; use precipitation_flux if pptrate is absent.
+                source_var_name = var_name
+
+                if var_name == "pptrate" and var_name not in ds.variables:
+                    source_var_name = "precipitation_flux"
+
+                if source_var_name not in ds.variables:
+                    raise KeyError(
+                        f"Variable '{var_name}' or its precipitation alternative "
+                        f"not found in {file_name}"
+                    )
+
                 time_var = ds.variables[time_name]
                 hru_ids = np.array(ds.variables[hru_name][:])
-                data_var = np.array(ds.variables[var_name][:])
+                data_var = np.array(ds.variables[source_var_name][:])
 
                 # Convert time
                 time_values = num2date(
@@ -1367,7 +1380,7 @@ def forcingnc_to_dataframe(
                 filtered_data = data_var[time_mask, :]
 
                 # Handle fill values
-                fill_value = getattr(ds.variables[var_name], '_FillValue', None)
+                fill_value = getattr(ds.variables[source_var_name], '_FillValue', None)
                 if fill_value is not None:
                     filtered_data = np.where(filtered_data == fill_value, np.nan, filtered_data)
 
@@ -1467,9 +1480,23 @@ def forcingnc_to_dict_by_hru(
 
         try:
             with Dataset(full_path, "r") as ds:
+
+                # Select precipitation variable available in the NetCDF file.
+                # Prefer pptrate; fall back to precipitation_flux.
+                source_var_name = var_name
+
+                if var_name == "pptrate" and var_name not in ds.variables:
+                    source_var_name = "precipitation_flux"
+
+                if source_var_name not in ds.variables:
+                    raise KeyError(
+                        f"Variable '{var_name}' or its precipitation alternative "
+                        f"not found in {file_name}"
+                    )
+
                 time_var = ds.variables[time_name]
                 hru_ids = np.array(ds.variables[hru_name][:])
-                data_var = np.array(ds.variables[var_name][:])
+                data_var = np.array(ds.variables[source_var_name][:])
 
                 time_values = num2date(
                     time_var[:],
@@ -1484,8 +1511,8 @@ def forcingnc_to_dict_by_hru(
 
                 filtered_time = time_values[time_mask]
                 filtered_data = data_var[time_mask, :]
-
-                fill_value = getattr(ds.variables[var_name], "_FillValue", None)
+                
+                fill_value = getattr(ds.variables[source_var_name], "_FillValue", None)
                 if fill_value is not None:
                     filtered_data = np.where(filtered_data == fill_value, np.nan, filtered_data)
 

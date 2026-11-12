@@ -701,6 +701,41 @@ def TempSedRout (river_gdf, sediment_size, config_file, h, q, Q,
                     del Cleft_array, A, M, MC, MCE
                 #BC for Downstream reach
                 SSC_river_frac[reach_id][k][0,:]=SSC_river_frac[n_us1][k][num_step-1,:]+SSC_river_frac[n_us2][k][num_step-1,:]+SSC_river_frac_base[reach_id][k][0,:]
+                #!!!
+                # ---------------------------------------------------------
+                # BC for downstream reach: mass-conservative mixing
+                # ---------------------------------------------------------
+                
+                # C_us1 = SSC_river_frac[n_us1][k][num_step-1, :]
+                # C_us2 = SSC_river_frac[n_us2][k][num_step-1, :]
+                
+                # Q_us1 = Qinterp[n_us1][num_step-1, :]
+                # Q_us2 = Qinterp[n_us2][num_step-1, :]
+                
+                # Q_ds = Qinterp[reach_id][0, :]
+                
+                # # Incremental/local flow entering at the downstream reach
+                # Q_local = np.maximum(Q_ds - Q_us1 - Q_us2, 0.0)
+                
+                # C_local = SSC_river_frac_base[reach_id][k][0, :]
+                
+                # sediment_flux = (
+                #     Q_us1 * C_us1
+                #     + Q_us2 * C_us2
+                #     + Q_local * C_local
+                # )
+                
+                # C_ds = np.zeros_like(Q_ds, dtype=float)
+                
+                # valid = Q_ds > 0.0
+                
+                # C_ds[valid] = (
+                #     sediment_flux[valid]
+                #     / Q_ds[valid]
+                # )
+                
+                # SSC_river_frac[reach_id][k][0, :] = C_ds
+                # ------------------------------------------------------------
                 
                 # IC for Downstream reach
                 SSC_river_frac[reach_id][k][:,0]=SSC_river_frac[n_us1][k][0,0]+SSC_river_frac[n_us2][k][0,0]+SSC_river_frac_base[reach_id][k][0,0] #SSC_river_frac_base[reach_id][k][:,0]
@@ -744,7 +779,36 @@ def TempSedRout (river_gdf, sediment_size, config_file, h, q, Q,
                     del Cleft_array, A, M, MC, MCE
                 #BC for Downstream reach
                 SSC_river_frac[reach_id][k][0,:]=SSC_river_frac[n_us][k][num_step-1,:]+SSC_river_frac_base[reach_id][k][0,:]
-                    
+                #!!!
+                # ---------------------------------------------------------
+                # BC for downstream reach: mass-conservative mixing
+                # ---------------------------------------------------------
+                
+                # C_us = SSC_river_frac[n_us][k][num_step-1, :]
+                # Q_us = Qinterp[n_us][num_step-1, :]
+                
+                # Q_ds = Qinterp[reach_id][0, :]
+                
+                # Q_local = np.maximum(Q_ds - Q_us, 0.0)
+                
+                # C_local = SSC_river_frac_base[reach_id][k][0, :]
+                
+                # sediment_flux = (
+                #     Q_us * C_us
+                #     + Q_local * C_local
+                # )
+                
+                # C_ds = np.zeros_like(Q_ds, dtype=float)
+                
+                # valid = Q_ds > 0.0
+                
+                # C_ds[valid] = (
+                #     sediment_flux[valid]
+                #     / Q_ds[valid]
+                # )
+                
+                # SSC_river_frac[reach_id][k][0, :] = C_ds
+                #-------------------------------------------------
                 # IC for Downstream reach
                 SSC_river_frac[reach_id][k][:,0]=SSC_river_frac[n_us][k][0,0]+SSC_river_frac_base[reach_id][k][0,0]
                     
